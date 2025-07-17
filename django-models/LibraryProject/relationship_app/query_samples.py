@@ -7,8 +7,8 @@ books = Book.objects.filter(author=author)
 for book in books:
   print(book.title)
 
-
-library = Library.objects.get(name = "Library_name")
+library_name = "Central Library"
+library = Library.objects.get(name =library_name)
 books_in_library = library.books.all()
 
 
