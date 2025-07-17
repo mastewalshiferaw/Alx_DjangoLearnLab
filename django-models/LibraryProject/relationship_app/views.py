@@ -1,7 +1,16 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.views.generic import DetailView 
 from .models import Book, Library          
 def list_all_books(request):
+    
+    all_books = Book.objects.all()
+    context = {
+        'books': all_books
+
+    }
+
+    return render (request, 'relationship_app/list_books.html, context')
    
     all_books = Book.objects.all()
     response_lines = []
