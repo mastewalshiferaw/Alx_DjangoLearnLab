@@ -1,7 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.detail import DetailView 
-from .models import Library, Books     
+from .models import Library, Books 
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm    
 
 
 def register(request):
