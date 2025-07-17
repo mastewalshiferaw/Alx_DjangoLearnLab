@@ -4,8 +4,8 @@ books = Book.objects.filter(author=author)
 for book in books:
   print(book.title)
 
-library = Library.objects.get(id=1)
-books = Book.objects.filter(library=library)
+library = Library.objects.get("Library_name", books.all())
+
 
 for book in books:
     print(book.title)
