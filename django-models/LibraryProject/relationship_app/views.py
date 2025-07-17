@@ -6,6 +6,8 @@ from .models import Library, Book, UserProfile
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm    
 
+from django.contrib.auth.decorators import permission_required
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from .forms import BookForm #<-- Import the new form
