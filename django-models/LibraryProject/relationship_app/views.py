@@ -6,11 +6,10 @@ from .models import Library, Book, UserProfile
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm    
 
-
-
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-
+from .forms import BookForm #<-- Import the new form
+from .models import Book 
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
@@ -85,3 +84,34 @@ def librarian_view(request):
 @user_passes_test(is_member, login_url='/relationships/login/')
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
+
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def book_add(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('list_books')
+    else:
+        form = BookForm()
+    return render(request, 'relationship_app/book_form.html', {'form': form})
+
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def book_edit(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('list_books')
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'relationship_app/book_form.html', {'form': form})
+
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def book_delete(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('list_books')
+    return render(request, 'relationship_app/book_confirm_delete.html', {'book': book})
