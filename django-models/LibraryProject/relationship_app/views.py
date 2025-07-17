@@ -1,7 +1,23 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.detail import DetailView 
-from .models import Library, Books        
+from .models import Library, Books     
+
+
+def register(request):
+    
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()  
+            login(request, user) 
+            return redirect('list_books')  
+    else:
+        form = UserCreationForm()  
+    return render(request, 'relationship_app/register.html', {'form': form})
+
+
+
 def list_all_books(request):
     
     all_books = Book.objects.all()
