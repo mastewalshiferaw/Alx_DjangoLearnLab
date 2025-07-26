@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'csp.middleware.CSPMiddleware', 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'LibraryProject.urls'
@@ -134,3 +136,38 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", 'https://cdnjs.cloudflare.com')
+CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com')
+CSP_IMG_SRC = ("'self'", 'data:')
+
+# Security settings for browser-side protection
+SECURE_BROWSER_XSS_FILTER = True  # Enables browser's XSS protection
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents MIME-type sniffing
+X_FRAME_OPTIONS = 'DENY'  # Prevents clickjacking by blocking iframes
+
+# Ensure cookies are only sent over HTTPS
+CSRF_COOKIE_SECURE = True  # CSRF cookie only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Session cookie only sent over HTTPS
+
+# Enforce HTTPS across the site
+SECURE_SSL_REDIRECT = True  # Redirect all HTTP traffic to HTTPS
+
+# Content Security Policy to restrict allowed sources of content
+CSP_DEFAULT_SRC = ("'self'",)  # Allow content only from own domain
+CSP_SCRIPT_SRC = ("'self'", 'https://cdnjs.cloudflare.com')  # Allow scripts from trusted CDN
+CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com')  # Allow styles from Google Fonts
+CSP_IMG_SRC = ("'self'", 'data:')  # Allow images from same site and inline images
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
