@@ -3,10 +3,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 class CustomUserManager(BaseUserManager):
-    """Define a model manager for User model with no username field."""
-
+   
     def _create_user(self, username, email, password=None, **extra_fields):
-        """Create and save a User with the given email and password."""
+        
         if not email:
             raise ValueError('The given email must be set')
         if not username:
@@ -36,12 +35,12 @@ class CustomUserManager(BaseUserManager):
 
 
 
-class CustomUser(AbstractUser):
-    date_of_birth = models.DateField(null=True, blank=True)
-    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
+#class CustomUser(AbstractUser):
+   # date_of_birth = models.DateField(null=True, blank=True)
+  #  profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
 
     
-    objects = CustomUserManager()
+  #  objects = CustomUserManager()
 
-    def __str__(self):
-        return self.username
+  #  def __str__(self):
+     #   return self.username

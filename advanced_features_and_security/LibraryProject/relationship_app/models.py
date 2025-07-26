@@ -31,6 +31,8 @@ class UserProfile(models.Model):
 
 
 
+
+
 class Author(models.Model):
   name = models.CharField(max_length=200)
 
