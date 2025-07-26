@@ -2,14 +2,20 @@ from django.shortcuts import render
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from .models import Book
-from .forms import forms
 
+from .forms import ExampleForm
 
-def search(request):
-    form = SearchForm(request.GET)
-    if form.is_valid():
-        query = form.cleaned_data['q']
-        results = MyModel.objects.filter(name__icontains=query)
+def example_view(request):
+    if request.method == 'POST':
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # process data
+            pass
+    else:
+        form = ExampleForm()
+
+    return render(request, 'bookshelf/example.html', {'form': form})
+
 
 
 
