@@ -1,0 +1,13 @@
+<!-- member_view.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Member Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, Member {{ user.username }}!</h1>
+    <p>You can use this dashboard to browse our collection of books and view your account.</p>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>
