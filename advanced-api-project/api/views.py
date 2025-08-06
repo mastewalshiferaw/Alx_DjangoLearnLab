@@ -51,22 +51,33 @@ class BookDeleteView(generics.DestroyAPIView):
 
 
 
-# We will also create views for the Author model for completeness.
+class BookListCreateAPIView(views.APIView):
+    """
+    This dispatcher view is connected to the '/api/books/' endpoint.
+    - If the request is GET, it dispatches to BookListView.
+    - If the request is POST, it dispatches to BookCreateView.
+    """
+    def get(self, request, *args, **kwargs):
+        return BookListView.as_view()(request, *args, **kwargs)
 
-class AuthorListCreateView(generics.ListCreateAPIView):
-    """
-    View to list all authors or create a new one.
-    - GET /api/authors/: Returns a list of all authors.
-    - POST /api/authors/: Creates a new author.
-    """
-    queryset = Author.objects.all()
-    serializer_class = AuthorSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def post(self, request, *args, **kwargs):
+        return BookCreateView.as_view()(request, *args, **kwargs)
 
-class AuthorDetailView(generics.RetrieveUpdateDestroyAPIView):
+class BookDetailUpdateDeleteAPIView(views.APIView):
     """
-    View to retrieve, update, or delete a single author by ID.
+    This dispatcher view is connected to the '/api/books/<pk>/' endpoint.
+    - If the request is GET, it dispatches to BookDetailView.
+    - If the request is PUT or PATCH, it dispatches to BookUpdateView.
+    - If the request is DELETE, it dispatches to BookDeleteView.
     """
-    queryset = Author.objects.all()
-    serializer_class = AuthorSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def get(self, request, *args, **kwargs):
+        return BookDetailView.as_view()(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return BookUpdateView.as_view()(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return BookUpdateView.as_view()(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return BookDeleteView.as_view()(request, *args, **kwargs)
