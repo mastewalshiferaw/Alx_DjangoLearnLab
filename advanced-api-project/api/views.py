@@ -3,7 +3,7 @@ from .models import Book
 from .serializers import BookSerializer
 
 
-class BookListCreateView(generics.ListAPIView):
+class BookListView(generics.ListAPIView):
     """
     View to list all books or create a new book.
     - GET /api/books/: Returns a list of all books.
