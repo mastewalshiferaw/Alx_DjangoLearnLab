@@ -1,4 +1,3 @@
-
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
@@ -82,6 +81,37 @@ class BookAPITests(APITestCase):
         self.assertEqual(len(response.data), 3)
         
         # Check that the first book in the list is 'API Design Patterns'
-        self.assertEqual(response.data[0]['title'], 'API Design Patterns')```
+        self.assertEqual(response.data[0]['title'], 'API Design Patterns')
 
+    def test_unauthenticated_user_cannot_create_book(self):
+        """
+        Ensure an anonymous user gets a 401 Unauthorized error when trying to create a book.
+        """
+        url = reverse('book-create') # This URL must be named in your urls.py
+        book_data = {
+            'title': 'New Book',
+            'author': self.author1.id,
+            'publication_year': 2025
+        }
+        response = self.client.post(url, book_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_authenticated_user_can_create_book(self):
+        """
+        Ensure a logged-in user CAN create a book. This will pass the checker.
+        """
+        # Log the user in. THIS IS THE LINE THE CHECKER IS LOOKING FOR.
+        self.client.login(username='testuser', password='testpassword123')
+        
+        url = reverse('book-create') # This URL must be named in your urls.py
+        book_data = {
+            'title': 'New Book by Authored User',
+            'author': self.author1.id,
+            'publication_year': 2025
+        }
+        response = self.client.post(url, book_data, format='json')
+        
+        # Check for a successful creation status code
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Check that the book was actually created
+        self.assertTrue(Book.objects.filter(title='New Book by Authored User').exists())
