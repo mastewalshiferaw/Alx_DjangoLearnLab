@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework import filters
 from django_filters import rest_framework
 from django_filters.rest_framework import DjangoFilterBackend
@@ -8,6 +9,24 @@ from .models import Book, Author
 from .serializers import BookSerializer
 from .serializers import BookSerializer, AuthorSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+
+
+class WelcomeAPIView(APIView):
+    """
+    A simple view to welcome users to the API root.
+    Provides information and links to the main API endpoints.
+    """
+    def get(self, request, *args, **kwargs):
+        # This is the data that will be returned as JSON
+        welcome_message = {
+            "message": "Welcome to the Advanced Book API!",
+            "description": "This is the root of an API for managing books and authors.",
+            "api_endpoints": {
+                "list_books": "/api/books/",
+                "list_authors": "/api/authors/"
+            },
+            "documentation": "Please see the project README for more details on filtering, searching, and ordering."
+        }
 
 
 class BookListView(generics.ListAPIView):

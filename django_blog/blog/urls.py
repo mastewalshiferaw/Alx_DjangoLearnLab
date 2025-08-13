@@ -1,7 +1,14 @@
 from django.urls import path
-# We import Django's built-in views for login and logout
+
 from django.contrib.auth import views as auth_views
 from . import views 
+from .views import (
+    PostListView,
+    PostDetailView,
+    PostCreateView,
+    PostUpdateView,
+    PostDeleteView
+)
 
 urlpatterns = [
     # Path for our custom registration view
@@ -17,4 +24,12 @@ urlpatterns = [
 
     # Path for custom profile view
     path('profile/', views.profile, name='profile'),
+
+        # Map each view to a URL
+    
+    path('', PostListView.as_view(), name='post-list'), # Set the home page to list all posts
+    path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
+    path('post/new/', PostCreateView.as_view(), name='post-create'),
+    path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
+    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
 ]
