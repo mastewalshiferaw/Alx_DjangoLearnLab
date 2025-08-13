@@ -1,0 +1,16 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<article class="post">
+    <h2>{{ object.title }}</h2>
+    <p class="post-meta">By {{ object.author }} on {{ object.date_posted|date:"F d, Y" }}</p>
+    <div class="post-content">{{ object.content }}</div>
+
+    <!-- Show Edit and Delete buttons ONLY if the logged-in user is the author -->
+    {% if object.author == user %}
+        <div>
+            <a class="btn btn-secondary" href="{% url 'post-update' object.id %}">Edit</a>
+            <a class="btn btn-danger" href="{% url 'post-delete' object.id %}">Delete</a>
+        </div>
+    {% endif %}
+</article>
+{% endblock content %}

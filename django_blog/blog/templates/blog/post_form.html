@@ -1,0 +1,23 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %} <!-- If you use crispy-forms -->
+{% block content %}
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset>
+                <legend>
+                    <!-- Change title based on whether we are creating or updating -->
+                    {% if object %}
+                        Update Post
+                    {% else %}
+                        New Post
+                    {% endif %}
+                </legend>
+                {{ form|crispy }} <!-- Or use {{ form.as_p }} without crispy-forms -->
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit">Post</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
