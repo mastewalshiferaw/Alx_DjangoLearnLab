@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
+
+from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -56,55 +58,29 @@ def profile(request):
     return render(request, 'blog/profile.html', context)
 
 # This is a view to display all posts.
-class PostListView(ListView):
-    model = Post
-    template_name = 'blog/post_list.html'  
-    context_object_name = 'posts'
-    ordering = ['-date_posted'] 
+
+
+    
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
 
-    def get_context_data(self, **kwargs):
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html' # We can reuse the same template as the update view
 
-        context = super().get_context_data(**kwargs)
-        #get the default context data from the parent class.
-        context['comment_form'] = CommentForm()
+    def form_valid(self, form):
+        # Find the post this comment belongs to by its ID (pk) in the URL
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        # Set the author to the currently logged-in user
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
-        return context
+    def get_success_url(self):
+        # After a successful comment, redirect back to the post's detail page
+        return reverse_lazy('post-detail', kwargs={'pk': self.kwargs['pk']})
     
-    #This method is called when the page is loaded via a POST  request
-    def post(self, request, *args, **kwargs):
-        
-        if not request.user.is_authenticated:
-            return redirect('login')
-
-        # self.get_object() gives us the Post instance 
-
-         post = self.get_object()
-        
-        form = CommentForm(request.POST)
-
-        if form.is_valid():
-            # Created a comment object but not saved to database yet (commit=False).
-            new_comment = form.save(commit=False)
-          
-            new_comment.post = post
-            new_comment.author = request.user
-            # Now saved to the database
-            new_comment.save()
-            messages.success(request, 'Your comment has been added.')
-            
-            return redirect('post-detail', pk=post.pk)
-        else:
-          
-            messages.error(request, 'There was an error with your comment. Please try again.')
-            return redirect('post-detail', pk=post.pk)
-
-    
-
-
-
 
 
 
@@ -149,3 +125,27 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == post.author:
             return True
         return False
+    
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
