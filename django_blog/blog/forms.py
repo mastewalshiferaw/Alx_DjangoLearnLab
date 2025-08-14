@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from .models import Comment
+
 # Our custom form inherits from Django's UserCreationForm
 class CustomUserCreationForm(UserCreationForm):
     # We add an email field, and make it required
@@ -19,3 +21,9 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email']
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+
+        fields = ['content']

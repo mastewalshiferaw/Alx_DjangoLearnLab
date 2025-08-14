@@ -11,7 +11,8 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Post
+from .models import Post, Comment
+from .forms import CommentForm
 
 
 # --- Registration View ---
@@ -62,6 +63,54 @@ class PostListView(ListView):
     ordering = ['-date_posted'] 
 class PostDetailView(DetailView):
     model = Post
+    template_name = 'blog/post_detail.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        #get the default context data from the parent class.
+        context['comment_form'] = CommentForm()
+
+        return context
+    
+    #This method is called when the page is loaded via a POST  request
+    def post(self, request, *args, **kwargs):
+        
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        # self.get_object() gives us the Post instance 
+
+         post = self.get_object()
+        
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            # Created a comment object but not saved to database yet (commit=False).
+            new_comment = form.save(commit=False)
+          
+            new_comment.post = post
+            new_comment.author = request.user
+            # Now saved to the database
+            new_comment.save()
+            messages.success(request, 'Your comment has been added.')
+            
+            return redirect('post-detail', pk=post.pk)
+        else:
+          
+            messages.error(request, 'There was an error with your comment. Please try again.')
+            return redirect('post-detail', pk=post.pk)
+
+    
+
+
+
+
+
+
+
+
+
 
 # This view allows a logged-in user to create a new post.
 class PostCreateView(LoginRequiredMixin, CreateView):
