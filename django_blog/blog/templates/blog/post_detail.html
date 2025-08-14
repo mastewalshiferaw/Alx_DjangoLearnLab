@@ -94,6 +94,18 @@
 
     <!-- Link to your JavaScript file -->
     <script src="{% static 'blog/js/scripts.js' %}"></script>
-
+{% for comment in object.comments.all %}
+    <div class="comment">
+        <p><strong>{{ comment.author }}</strong> <small>on {{ comment.created_at|date:"M d, Y" }}</small></p>
+        <p>{{ comment.content }}</p>
+        
+        <!-- Add this block -->
+        {% if comment.author == user %}
+            <a href="{% url 'comment-update' comment.id %}" class="btn-sm btn-secondary">Edit</a>
+            <a href="{% url 'comment-delete' comment.id %}" class="btn-sm btn-danger">Delete</a>
+        {% endif %}
+        <!-- End of new block -->
+    </div>
+{% endfor %}
 </body>
 </html>
