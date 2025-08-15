@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Comment
+from taggit.forms import TagWidget
 
 # Our custom form inherits from Django's UserCreationForm
 class CustomUserCreationForm(UserCreationForm):
@@ -31,10 +32,18 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         # These are the fields the user will be able to edit on their profile.
         fields = ['username', 'email']
-        
+
 class CommentForm(forms.ModelForm):
     class Meta: #it is where you connect your form to your model and configure it is behaviour 
         model = Comment
 
         fields = ['content']
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'tags']
+        widgets = {
+            'tags': TagWidget(attrs={'placeholder': 'Comma-separated tags'}),
+        }
 
