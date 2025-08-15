@@ -22,8 +22,19 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ['username', 'email']
 
-class CommentForm(forms.ModelForm):
+class UserUpdateForm(forms.ModelForm):
+    # We add an email field to ensure it's included in the form.
+    email = forms.EmailField()
+
     class Meta:
+        # This form is built from the User model.
+        model = User
+        # These are the fields the user will be able to edit on their profile.
+        fields = ['username', 'email']
+        
+class CommentForm(forms.ModelForm):
+    class Meta: #it is where you connect your form to your model and configure it is behaviour 
         model = Comment
 
         fields = ['content']
+
