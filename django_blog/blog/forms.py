@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.db.models import Q
-# Make sure PostForm is included in this import
 from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm, PostForm
 from .models import Post, Comment
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -42,25 +41,21 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
 
-# =================================================================
-# THIS IS THE SECTION THAT NEEDS TO BE CORRECTED
-# =================================================================
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    form_class = PostForm # USE THE SPECIAL FORM
+    form_class = PostForm
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    form_class = PostForm # USE THE SPECIAL FORM
+    form_class = PostForm
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
     def test_func(self):
         return self.request.user == self.get_object().author
-# =================================================================
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
