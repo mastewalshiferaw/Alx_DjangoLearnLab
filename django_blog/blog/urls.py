@@ -14,7 +14,8 @@ from .views import (
     PostDeleteView,
     CommentCreateView, 
     CommentUpdateView,
-    CommentDeleteView
+    CommentDeleteView,
+    TaggedPostListView
 )
 
 urlpatterns = [
