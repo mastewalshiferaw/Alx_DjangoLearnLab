@@ -28,6 +28,11 @@
         <p>&copy; 2024 Django Blog</p>
     </footer>
 
+    <form class="search-form" method="GET" action="{% url 'search-results' %}">
+    <input type="text" name="q" placeholder="Search...">
+    <button type="submit">Search</button>
+</form>
+
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>
