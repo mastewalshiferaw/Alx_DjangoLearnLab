@@ -1,43 +1,24 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
-from .models import Comment
+from django.contrib.auth.forms import UserCreationForm
+from .models import Post, Comment
 from taggit.forms import TagWidget
 
-# Our custom form inherits from Django's UserCreationForm
+# Form for user registration.
 class CustomUserCreationForm(UserCreationForm):
-    # We add an email field, and make it required
-    email = forms.EmailField(required=True, help_text='Required. Please provide a valid email address.')
-
+    email = forms.EmailField(required=True)
     class Meta(UserCreationForm.Meta):
-        # We start with the default model and fields
         model = User
-        # new 'email' field to the list of fields to display
         fields = UserCreationForm.Meta.fields + ('email',)
-    
-    class UserUpdateForm(forms.ModelForm):
-        email = forms.EmailField()
 
-    class Meta:
-        model = User
-        fields = ['username', 'email']
-
+# Form for updating a user's profile.
 class UserUpdateForm(forms.ModelForm):
-    # We add an email field to ensure it's included in the form.
     email = forms.EmailField()
-
     class Meta:
-        # This form is built from the User model.
         model = User
-        # These are the fields the user will be able to edit on their profile.
         fields = ['username', 'email']
 
-class CommentForm(forms.ModelForm):
-    class Meta: #it is where you connect your form to your model and configure it is behaviour 
-        model = Comment
-
-        fields = ['content']
+# Form for creating and updating blog posts.
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -47,3 +28,8 @@ class PostForm(forms.ModelForm):
             'tags': TagWidget(attrs={'placeholder': 'Comma-separated tags'}),
         }
 
+# Form for adding comments to a post.
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']

@@ -30,39 +30,46 @@ def profile(request):
             return redirect('profile')
     else:
         u_form = UserUpdateForm(instance=request.user)
+    # The context dictionary was missing its key, this is now fixed.
     return render(request, 'blog/profile.html', {'u_form': u_form})
 
+# Handles displaying the list of all posts.
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
     ordering = ['-date_posted']
 
+# Handles displaying a single post.
 class PostDetailView(DetailView):
     model = Post
 
+# Handles creating a new post using the custom PostForm.
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content', 'tags']
+    form_class = PostForm # CHANGED: Use the explicit PostForm.
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
+# Handles updating a post using the custom PostForm.
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content', 'tags']
+    form_class = PostForm # CHANGED: Use the explicit PostForm.
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
     def test_func(self):
         return self.request.user == self.get_object().author
 
+# Handles deleting a post.
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     success_url = reverse_lazy('post-list')
     def test_func(self):
         return self.request.user == self.get_object().author
 
+# Handles displaying search results.
 class SearchResultsView(ListView):
     model = Post
     template_name = 'blog/search_results.html'
@@ -79,6 +86,7 @@ class SearchResultsView(ListView):
         context['query'] = self.request.GET.get('q', '')
         return context
 
+# Handles creating a new comment.
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
@@ -90,6 +98,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('post-detail', kwargs={'pk': self.kwargs['pk']})
 
+# Handles updating a comment.
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
@@ -99,6 +108,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
 
+# Handles deleting a comment.
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = 'blog/comment_confirm_delete.html'
@@ -107,6 +117,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
 
+# Handles displaying posts filtered by a specific tag.
 class TaggedPostListView(ListView):
     model = Post
     template_name = 'blog/posts_by_tag.html'
