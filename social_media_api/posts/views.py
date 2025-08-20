@@ -1,13 +1,14 @@
-from rest_framework import viewsets, permissions, filters
-from rest_framework.pagination import PageNumberPagination
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Post
+from .serializers import PostSerializer
 
-=
 class PostPagination(PageNumberPagination):
     page_size = 5
 
-=
+
 class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         
@@ -22,10 +23,10 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
     filter_backends = [filters.SearchFilter]  # Allow search
-    search_fields = ['title', 'content']      =
+    search_fields = ['title', 'content']     
     pagination_class = PostPagination
 
-   t
+   
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -38,3 +39,15 @@ class CommentViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def feed_view(request):
+    
+    
+    following_users = request.user.following.all()  
+
+    feed_posts = Post.objects.filter(author__in=following_users).order_by("-created_at")  
+
+    serializer = PostSerializer(feed_posts, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
