@@ -14,16 +14,16 @@ from .serializers import PostSerializer
 User = get_user_model()
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+class RegisterView(generics.GenericAPIView):
+    queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        user = User.objects.get(username=response.data["username"])
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"user": response.data, "token": token.key})
-
+        return Response({"user": serializer.data, "token": token.key})
 
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
@@ -41,12 +41,21 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ("followers",)
 
 
-class ProfileView(generics.RetrieveUpdateAPIView):
+class ProfileView(generics.GenericAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
 
 
 @api_view(["POST"])
@@ -90,10 +99,3 @@ def unfollow_user(request, user_id):
         status=status.HTTP_200_OK
     )
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def feed(request):
-    followed_users = request.user.following.all()
-    posts = Post.objects.filter(author__in=followed_users).order_by("-created_at")
-    serializer = PostSerializer(posts, many=True)
-    return Response(serializer.data)
