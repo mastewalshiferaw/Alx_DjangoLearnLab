@@ -2,8 +2,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Post
+from .models import Post, Like
 from .serializers import PostSerializer
+from django.contrib.auth.decorators import login_required
+from notifications.models import Notification
+from django.http import HttpResponseForbidden
+
 
 class PostPagination(PageNumberPagination):
     page_size = 5
@@ -51,3 +55,38 @@ def feed_view(request):
 
     serializer = PostSerializer(feed_posts, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Prevent duplicate likes
+    if Like.objects.filter(post=post, user=request.user).exists():
+        return HttpResponseForbidden("You already liked this post.")
+
+    # Create like
+    Like.objects.create(post=post, user=request.user)
+
+    # notification (don’t notify yourself)
+    if post.author != request.user:
+        Notification.objects.create(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked your post",
+            content_type=ContentType.objects.get_for_model(Post),
+            object_id=post.id,
+        )
+
+    return redirect("post_detail", post_id=post.id)
+
+
+@login_required
+def unlike_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    
+    Like.objects.filter(post=post, user=request.user).delete()
+
+    return redirect("post_detail", post_id=post.id)

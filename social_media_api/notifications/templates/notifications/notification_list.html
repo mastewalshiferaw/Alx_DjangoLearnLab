@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Notifications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #fff;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        li.unread {
+            font-weight: bold;
+            background-color: #eef6ff;
+        }
+
+        .timestamp {
+            display: block;
+            font-size: 0.85em;
+            color: #777;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Your Notifications</h2>
+
+    <ul>
+        {% for notification in notifications %}
+            <li class="{% if not notification.read %}unread{% endif %}">
+                {{ notification.actor.username }} {{ notification.verb }}
+                {% if notification.target %}{{ notification.target }}{% endif %}
+                <span class="timestamp">{{ notification.timestamp }}</span>
+            </li>
+        {% empty %}
+            <li>No notifications yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
