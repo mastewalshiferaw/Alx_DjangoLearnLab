@@ -82,10 +82,12 @@ WSGI_APPLICATION = 'social_media_api.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600 # Optional: Number of seconds database connections should persist
+        conn_max_age=600
     )
 }
 
+
+DATABASES['default']['PORT'] = os.environ.get('DB_PORT', '5432')  
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
