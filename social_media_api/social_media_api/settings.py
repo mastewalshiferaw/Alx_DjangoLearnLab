@@ -149,5 +149,3 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-for deployment.
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
